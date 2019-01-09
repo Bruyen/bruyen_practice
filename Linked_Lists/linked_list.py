@@ -36,7 +36,18 @@ class linked_list_node:
         current.next_node = linked_list_node(value)
         return self
 
-    def delete_node(node, value):
+    def del_node(node):
+        if(node is None or node.next_node is None):
+            print "Can not reference this node with this method. " \
+                "Use pop_tail() instead."
+            return node
+
+        next = linked_list_node(node.next_node.value, node.next_node.next_node)
+        node.value = next.value
+        node.next_node = next.next_node
+        return node
+
+    def del_first_val(node, value):
         current = node
         if (current.value == value):
             return current.next_node
@@ -117,9 +128,25 @@ class Test_linked_lists:
         (node1, 9, '1->2->3->4'),
         (node1, 3, '1->2->4')
     ])
-    def test_del(self, node, value, expected):
-        node.delete_node(value)
+    def test_del_by_value(self, node, value, expected):
+        node.del_first_val(value)
         assert str(node) == expected
+
+    @pytest.mark.parametrize("arr, pos, expected", [
+        ([1, 2, 3, 4, 5], 2, '1->2->4->5'),
+        (['m', 'o', 'n', 'k', 'e', 'y'], 0, 'o->n->k->e->y')
+    ])
+    def test_del(self, arr, pos, expected):
+        LL = array_to_linked(arr)
+        node = LL
+
+        while node.next_node is not None and pos > 0:
+            pos -= 1
+            node = node.next_node
+
+        print "test_del: node is at: " + str(node.value)
+        node.del_node()
+        assert str(LL) == expected
 
     @pytest.mark.parametrize("arr, expected", [
         ([1, 2, 3, 4, 5], '2->3->4->5'),
