@@ -46,8 +46,35 @@ class linked_list_node:
                 current.next_node = current.next_node.next_node
                 return node
             current = current.next_node
-
         return node
+
+    def pop_head(self):
+        self.value = self.next_node.value
+        self.next_node = self.next_node.next_node
+        return self
+
+    def pop_tail(self):
+        current = self
+        while current.next_node.next_node is not None:
+            current = current.next_node
+        current.next_node = None
+        return self
+
+    def set(self, node):
+        self.value = node.value
+        self.next_node = node.next_node
+
+
+def array_to_linked(arr):
+    if isinstance(arr, list) or isinstance(arr, tuple):
+        head = linked_list_node(arr[0])
+        current = head
+        for i in range(1, len(arr)):
+            node = linked_list_node(arr[i])
+            current.next_node = node
+            current = node
+        return head
+    print arr + " is not an array or tuple."
 
 
 class Test_linked_lists:
@@ -59,6 +86,15 @@ class Test_linked_lists:
     node1.next_node = node2
     node2.next_node = node3
     node3.next_node = node4
+
+    @pytest.mark.parametrize("arr, expected", [
+        ([1, 2, 3, 4, 5], '1->2->3->4->5'),
+        (['m', 'o', 'n', 'k', 'e', 'y'], 'm->o->n->k->e->y'),
+        (['foo', 'bar', 'fizz', 'buzz'], 'foo->bar->fizz->buzz')
+    ])
+    def test_array_init(self, arr, expected):
+        node = array_to_linked(arr)
+        assert str(node) == expected
 
     @pytest.mark.parametrize("node, expected", [
         (node1, 4),
@@ -76,3 +112,31 @@ class Test_linked_lists:
     def test_append(self, node, value, expected):
         node.append(value)
         assert str(node) == expected
+
+    @pytest.mark.parametrize("node, value, expected", [
+        (node1, 9, '1->2->3->4'),
+        (node1, 3, '1->2->4')
+    ])
+    def test_del(self, node, value, expected):
+        node.delete_node(value)
+        assert str(node) == expected
+
+    @pytest.mark.parametrize("arr, expected", [
+        ([1, 2, 3, 4, 5], '2->3->4->5'),
+        (['m', 'o', 'n', 'k', 'e', 'y'], 'o->n->k->e->y'),
+        (['foo', 'bar', 'fizz', 'buzz'], 'bar->fizz->buzz')
+    ])
+    def test_pop_head(self, arr, expected):
+        LL = array_to_linked(arr)
+        LL.pop_head()
+        assert str(LL) == expected
+
+    @pytest.mark.parametrize("arr, expected", [
+        ([1, 2, 3, 4, 5], '1->2->3->4'),
+        (['m', 'o', 'n', 'k', 'e', 'y'], 'm->o->n->k->e'),
+        (['foo', 'bar', 'fizz', 'buzz'], 'foo->bar->fizz')
+    ])
+    def test_pop_tail(self, arr, expected):
+        LL = array_to_linked(arr)
+        LL.pop_tail()
+        assert str(LL) == expected
